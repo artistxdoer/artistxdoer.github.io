@@ -18,12 +18,13 @@
         }
 
         canvas {
-    border: 2px solid #00FF00; /* Neon green border for the canvas */
-    background-color: #000; /* Black canvas background */
-    max-width: auto; /* Adjust the maximum width automatically */
-    max-height: auto; /* Adjust the maximum height automatically */
-    touch-action: none; /* Disable touch screen scroll */
-}
+            border: 2px solid #00FF00; /* Neon green border for the canvas */
+            background-color: #000; /* Black canvas background */
+            max-width: auto; /* Adjust the maximum width automatically */
+            max-height: auto; /* Adjust the maximum height automatically */
+            touch-action: none; /* Disable touch screen scroll */
+        }
+
         button {
             width: 80px;
             height: 40px;
@@ -43,8 +44,8 @@
 
         #upButton {
             position: absolute;
-            bottom: 60px;
-            right: 10px;
+            bottom: 10px;
+            right: 110px; /* Adjusted position */
         }
 
         #downButton {
@@ -61,215 +62,64 @@
     <button id="downButton">Down</button>
     <canvas id="gameCanvas"></canvas>
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const flapSound = new Audio('flap.wav');
-        const scoreSound = new Audio('score.wav');
-        const hitSound = new Audio('hit.wav');
-        const androidIcon = new Image();
-        androidIcon.src = 'android_icon.png'; // Replace 'android_icon.png' with the path to your Android icon
+        // JavaScript code goes here
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const flapSound = new Audio('flap.wav');
+const scoreSound = new Audio('score.wav');
+const hitSound = new Audio('hit.wav');
+const androidIcon = new Image();
+androidIcon.src = 'android_icon.png';
 
-        const bird = {
-            x: 100,
-            y: canvas.height / 2,
-            velocity: 0,
-            gravity: 0.5,
-            jump: -8,
-            width: 50,
-            height: 50,
-            alive: true,
-            draw: function() {
-                ctx.drawImage(androidIcon, this.x, this.y, this.width, this.height);
-            },
-            flap: function() {
-                if (this.alive) {
-                    this.velocity = this.jump;
-                    flapSound.play();
-                }
-            },
-            update: function() {
-                if (this.alive) {
-                    this.velocity += this.gravity;
-                    this.y += this.velocity;
+const bird = {
+    x: 100,
+    y: canvas.height / 2,
+    velocity: 0,
+    gravity: 0.5,
+    jump: -8,
+    width: 50,
+    height: 50,
+    alive: true,
+    draw: function() {
+        ctx.drawImage(androidIcon, this.x, this.y, this.width, this.height);
+    },
+    flap: function() {
+        if (this.alive) {
+            this.velocity = this.jump;
+            flapSound.play();
+        }
+    },
+    update: function() {
+        if (this.alive) {
+            this.velocity += this.gravity;
+            this.y += this.velocity;
 
-                    if (this.y > canvas.height - this.height) {
-                        this.y = canvas.height - this.height;
-                        this.velocity = 0;
-                    }
-                }
-            }
-        };
-
-        class Obstacle {
-            constructor(canvasWidth, canvasHeight) {
-                this.x = canvasWidth;
-                this.y = Math.random() * (canvasHeight - obstacleGap);
-                this.width = obstacleWidth;
-                this.height = canvasHeight - this.y - obstacleGap;
-                this.color = getRandomColor();
-            }
-
-            update() {
-                this.x -= obstacleSpeed;
-            }
-
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, 0, this.width, this.y);
-                ctx.fillRect(this.x, this.y + obstacleGap, this.width, this.height);
-            }
-
-            collide(bird) {
-                if (!bird.alive) return false;
-                return (
-                    bird.x < this.x + this.width &&
-                    bird.x + bird.width > this.x &&
-                    bird.y < this.y + this.height &&
-                    bird.y + bird.height > this.y
-                );
-            }
-
-            passed(bird) {
-                return bird.x > this.x + this.width;
-            }
-
-            offscreen() {
-                return this.x + this.width < 0;
+            if (this.y > canvas.height - this.height) {
+                this.y = canvas.height - this.height;
+                this.velocity = 0;
             }
         }
-
-        const obstacles = [];
-        const obstacleGap = 200;
-        const obstacleWidth = 60;
-        const obstacleSpeed = 4; // Increased obstacle speed for a more challenging game
-
-        let score = 0;
-        let paused = false;
-        let gameRunning = false;
-
-        function drawScore() {
-            ctx.fillStyle = '#00FF00';
-            ctx.font = '30px Courier New';
-            ctx.fillText('Score: ' + score, 10, 40);
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            bird.draw();
-            obstacles.forEach(obstacle => obstacle.draw());
-            drawScore();
-        }
-
-        function update() {
-            if (!paused && gameRunning) {
-                bird.update();
-                obstacles.forEach(obstacle => {
-                    obstacle.update();
-                    if (obstacle.collide(bird)) {
-                        hitSound.play();
-                        bird.alive = false;
-                        gameOver();
-                    }
-                    if (obstacle.passed(bird)) {
-                        score++;
-                        scoreSound.play();
-                    }
-                });
-                if (Math.random() < 0.02) {
-                    obstacles.push(new Obstacle(canvas.width, canvas.height));
-                }
-                obstacles.forEach((obstacle, index) => {
-                    if (obstacle.offscreen()) {
-                        obstacles.splice(index, 1);
-                    }
-                });
-            }
-        }
-
-        function gameOver() {
-            alert('Game Over! Your score: ' + score);
-            score = 0;
-            obstacles.length = 0;
-            bird.y = canvas.height / 2;
-            bird.alive = true; // Reset bird's alive state
-            gameRunning = false;
-        }
-
-        function gameLoop() {
-            if (gameRunning) {
-                draw();
-                update();
-                requestAnimationFrame(gameLoop);
-            }
-        }
-
-        function handleKeyDown(event) {
-            if (!paused && gameRunning) {
-                if (event.key === 'ArrowUp' || event.key === ' ') {
-                    bird.flap();
-                }
-            }
-        }
-
-        document.addEventListener('keydown', handleKeyDown);
-
-        window.addEventListener('resize', resizeCanvas);
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        resizeCanvas();
-
-        const pauseButton = document.getElementById('pauseButton');
-        pauseButton.addEventListener('click', () => {
-            paused = !paused;
-            pauseButton.textContent = paused ? 'Resume' : 'Pause';
-            if (!paused) {
-                gameRunning = true;
-                gameLoop();
-            }
-        });
-
-        const upButton = document.getElementById('upButton');
-        upButton.addEventListener('click', () => {
-            bird.flap();
-            gameRunning = true;
-        });
-
-        const downButton = document.getElementById('downButton');
-        downButton.addEventListener('click', () => {
-            bird.y += 20;
-            gameRunning = true;
-        });
-
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-function gameLoop() {
-    if (gameRunning && !paused) {
-        draw();
-        update();
-        requestAnimationFrame(gameLoop);
     }
-}
-function gameOver() {
-    alert('Game Over! Your score: ' + score);
-    score = 0;
-    obstacles.length = 0;
-    bird.y = canvas.height / 2;
-    bird.alive = true; // Reset bird's alive state
-    gameRunning = true;
-}
+};
+
 class Obstacle {
-    // Other code...
+    constructor(canvasWidth, canvasHeight) {
+        this.x = canvasWidth;
+        this.y = Math.random() * (canvasHeight - obstacleGap);
+        this.width = obstacleWidth;
+        this.height = canvasHeight - this.y - obstacleGap;
+        this.color = getRandomColor();
+    }
+
+    update() {
+        this.x -= obstacleSpeed;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, 0, this.width, this.y);
+        ctx.fillRect(this.x, this.y + obstacleGap, this.width, this.height);
+    }
 
     collide(bird) {
         if (!bird.alive) return false;
@@ -281,9 +131,128 @@ class Obstacle {
         );
     }
 
-    
+    passed(bird) {
+        return bird.x > this.x + this.width;
+    }
+
+    offscreen() {
+        return this.x + this.width < 0;
+    }
+}
+
+// Game variables
+const obstacles = [];
+const obstacleGap = 200;
+const obstacleWidth = 60;
+const obstacleSpeed = 4;
+let score = 0;
+let paused = false;
+let gameRunning = false;
+
+function drawScore() {
+    ctx.fillStyle = '#00FF00';
+    ctx.font = '30px Courier New';
+    ctx.fillText('Score: ' + score, 10, 40);
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bird.draw();
+    obstacles.forEach(obstacle => obstacle.draw());
+    drawScore();
+}
+
+function update() {
+    if (!paused && gameRunning) {
+        bird.update();
+        obstacles.forEach(obstacle => {
+            obstacle.update();
+            if (obstacle.collide(bird)) {
+                hitSound.play();
+                bird.alive = false;
+                gameOver();
+            }
+            if (obstacle.passed(bird)) {
+                score++;
+                scoreSound.play();
+            }
+        });
+        if (Math.random() < 0.02) {
+            obstacles.push(new Obstacle(canvas.width, canvas.height));
+        }
+        obstacles.forEach((obstacle, index) => {
+            if (obstacle.offscreen()) {
+                obstacles.splice(index, 1);
+            }
+        });
+    }
+}
+
+function gameOver() {
+    alert('Game Over! Your score: ' + score);
+    resetGame();
+}
+
+function resetGame() {
+    score = 0;
+    obstacles.length = 0;
+    bird.y = canvas.height / 2;
+    bird.alive = true;
+    gameRunning = false;
+}
+
+function gameLoop() {
+    if (gameRunning && !paused) {
+        draw();
+        update();
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+function handleKeyDown(event) {
+    if (!paused && gameRunning) {
+        if (event.key === 'ArrowUp' || event.key === ' ') {
+            bird.flap();
+        }
+    }
+}
+
+document.addEventListener('keydown', handleKeyDown);
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+document.getElementById('pauseButton').addEventListener('click', () => {
+    paused = !paused;
+    document.getElementById('pauseButton').textContent = paused ? 'Resume' : 'Pause';
+    if (!paused) {
+        gameRunning = true;
+        gameLoop();
+    }
+});
+
+document.getElementById('upButton').addEventListener('click', () => {
+    bird.flap();
+    gameRunning = true;
+    gameLoop();
+});
+
+document.getElementById('downButton').addEventListener('click', () => {
+    bird.y += 20;
+    gameRunning = true;
+    gameLoop();
+});
+
+// Initialize canvas size
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Start the game loop
+gameLoop();
 
     </script>
+
 </body>
 </html>
-

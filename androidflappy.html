@@ -266,7 +266,7 @@ function gameOver() {
     obstacles.length = 0;
     bird.y = canvas.height / 2;
     bird.alive = true; // Reset bird's alive state
-    gameRunning = false;
+    gameRunning = true;
 }
 class Obstacle {
     // Other code...
@@ -281,33 +281,7 @@ class Obstacle {
         );
     }
 
-    // Other code...
-}
-function update() {
-    if (!paused && gameRunning) {
-        bird.update();
-        obstacles.forEach(obstacle => {
-            obstacle.update();
-            if (obstacle.collide(bird)) {
-                hitSound.play();
-                bird.alive = false;
-                gameOver();
-            }
-            if (obstacle.passed(bird)) {
-                score++;
-                scoreSound.play();
-            }
-        });
-        if (Math.random() < 0.02) {
-            obstacles.push(new Obstacle(canvas.width, canvas.height));
-        }
-        obstacles.forEach((obstacle, index) => {
-            if (obstacle.offscreen()) {
-                obstacles.splice(index, 1);
-            }
-        });
-    }
-}
+    
 
     </script>
 </body>

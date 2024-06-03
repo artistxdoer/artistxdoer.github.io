@@ -18,13 +18,12 @@
         }
 
         canvas {
-            border: 2px solid #00FF00; /* Neon green border for the canvas */
-            background-color: #000; /* Black canvas background */
-            max-width: 90%; /* Adjust the maximum width */
-            max-height: 90%; /* Adjust the maximum height */
-            touch-action: none; /* Disable touch screen scroll */
-        }
-
+    border: 2px solid #00FF00; /* Neon green border for the canvas */
+    background-color: #000; /* Black canvas background */
+    max-width: auto; /* Adjust the maximum width automatically */
+    max-height: auto; /* Adjust the maximum height automatically */
+    touch-action: none; /* Disable touch screen scroll */
+}
         button {
             width: 80px;
             height: 40px;
@@ -259,6 +258,54 @@ function gameLoop() {
         draw();
         update();
         requestAnimationFrame(gameLoop);
+    }
+}
+function gameOver() {
+    alert('Game Over! Your score: ' + score);
+    score = 0;
+    obstacles.length = 0;
+    bird.y = canvas.height / 2;
+    bird.alive = true; // Reset bird's alive state
+    gameRunning = false;
+}
+class Obstacle {
+    // Other code...
+
+    collide(bird) {
+        if (!bird.alive) return false;
+        return (
+            bird.x < this.x + this.width &&
+            bird.x + bird.width > this.x &&
+            bird.y < this.y + this.height &&
+            bird.y + bird.height > this.y
+        );
+    }
+
+    // Other code...
+}
+function update() {
+    if (!paused && gameRunning) {
+        bird.update();
+        obstacles.forEach(obstacle => {
+            obstacle.update();
+            if (obstacle.collide(bird)) {
+                hitSound.play();
+                bird.alive = false;
+                gameOver();
+            }
+            if (obstacle.passed(bird)) {
+                score++;
+                scoreSound.play();
+            }
+        });
+        if (Math.random() < 0.02) {
+            obstacles.push(new Obstacle(canvas.width, canvas.height));
+        }
+        obstacles.forEach((obstacle, index) => {
+            if (obstacle.offscreen()) {
+                obstacles.splice(index, 1);
+            }
+        });
     }
 }
 

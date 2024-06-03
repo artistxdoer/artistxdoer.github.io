@@ -254,7 +254,14 @@
             }
             return color;
         }
-        gameLoop();
+function gameLoop() {
+    if (gameRunning && !paused) {
+        draw();
+        update();
+        requestAnimationFrame(gameLoop);
+    }
+}
+
     </script>
 </body>
 </html>

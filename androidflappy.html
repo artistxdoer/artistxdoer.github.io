@@ -108,7 +108,6 @@ class Obstacle {
         this.y = Math.random() * (canvasHeight - obstacleGap);
         this.width = obstacleWidth;
         this.height = canvasHeight - this.y - obstacleGap;
-        this.color = getRandomColor();
     }
 
     update() {
@@ -116,9 +115,11 @@ class Obstacle {
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, 0, this.width, this.y);
-        ctx.fillRect(this.x, this.y + obstacleGap, this.width, this.height);
+        ctx.strokeStyle = '#00FF00'; // Neon green color
+        ctx.lineWidth = 3;
+        ctx.setLineDash([10, 10]); // Dashed border
+        ctx.strokeRect(this.x, 0, this.width, this.y);
+        ctx.strokeRect(this.x, this.y + obstacleGap, this.width, this.height);
     }
 
     collide(bird) {
@@ -153,13 +154,6 @@ function drawScore() {
     ctx.fillStyle = '#00FF00';
     ctx.font = '30px Courier New';
     ctx.fillText('Score: ' + score, 10, 40);
-}
-
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bird.draw();
-    obstacles.forEach(obstacle => obstacle.draw());
-    drawScore();
 }
 
 function update() {
@@ -253,6 +247,5 @@ canvas.height = window.innerHeight;
 gameLoop();
 
     </script>
-
 </body>
 </html>

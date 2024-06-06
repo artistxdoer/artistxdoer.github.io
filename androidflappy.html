@@ -62,7 +62,7 @@
     <button id="downButton">Down</button>
     <canvas id="gameCanvas"></canvas>
     <script>
-        // JavaScript code goes here
+      // JavaScript code goes here
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const flapSound = new Audio('flap.wav');
@@ -148,7 +148,6 @@ const obstacleWidth = 60;
 const obstacleSpeed = 4;
 let score = 0;
 let paused = false;
-let gameRunning = false;
 
 function drawScore() {
     ctx.fillStyle = '#00FF00';
@@ -157,7 +156,7 @@ function drawScore() {
 }
 
 function update() {
-    if (!paused && gameRunning) {
+    if (!paused) {
         bird.update();
         obstacles.forEach(obstacle => {
             obstacle.update();
@@ -192,19 +191,18 @@ function resetGame() {
     obstacles.length = 0;
     bird.y = canvas.height / 2;
     bird.alive = true;
-    gameRunning = false;
 }
 
 function gameLoop() {
-    if (gameRunning && !paused) {
-        draw();
-        update();
+    draw();
+    update();
+    if (!paused) {
         requestAnimationFrame(gameLoop);
     }
 }
 
 function handleKeyDown(event) {
-    if (!paused && gameRunning) {
+    if (!paused) {
         if (event.key === 'ArrowUp' || event.key === ' ') {
             bird.flap();
         }
@@ -222,21 +220,16 @@ document.getElementById('pauseButton').addEventListener('click', () => {
     paused = !paused;
     document.getElementById('pauseButton').textContent = paused ? 'Resume' : 'Pause';
     if (!paused) {
-        gameRunning = true;
         gameLoop();
     }
 });
 
 document.getElementById('upButton').addEventListener('click', () => {
     bird.flap();
-    gameRunning = true;
-    gameLoop();
 });
 
 document.getElementById('downButton').addEventListener('click', () => {
     bird.y += 20;
-    gameRunning = true;
-    gameLoop();
 });
 
 // Initialize canvas size
@@ -245,7 +238,6 @@ canvas.height = window.innerHeight;
 
 // Start the game loop
 gameLoop();
-
     </script>
 </body>
 </html>

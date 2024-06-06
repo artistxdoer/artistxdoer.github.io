@@ -51,14 +51,21 @@
             bottom: 10px;
             right: 10px;
         }
+
+        #gameContainer {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <a href="instructions.html">How to Play</a>
-    <button id="pauseButton">Pause</button>
-    <button id="upButton">Up</button>
-    <button id="downButton">Down</button>
-    <canvas id="gameCanvas"></canvas>
+    <button id="startButton">Start</button>
+    <div id="gameContainer">
+        <button id="pauseButton">Pause</button>
+        <button id="upButton">Up</button>
+        <button id="downButton">Down</button>
+        <canvas id="gameCanvas"></canvas>
+    </div>
     <script>
         // JavaScript code goes here
         const canvas = document.getElementById('gameCanvas');
@@ -212,6 +219,12 @@
             canvas.height = window.innerHeight;
         });
 
+        document.getElementById('startButton').addEventListener('click', () => {
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            gameLoop();
+        });
+
         document.getElementById('pauseButton').addEventListener('click', () => {
             paused = !paused;
             document.getElementById('pauseButton').textContent = paused ? 'Resume' : 'Pause';
@@ -237,10 +250,8 @@
         // Initialize canvas size
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
-        // Start the game loop
-        gameLoop();
     </script>
 </body>
 </html>
+
 
